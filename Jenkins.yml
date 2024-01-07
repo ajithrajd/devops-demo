@@ -1,0 +1,84 @@
+pipeline {
+
+  agent any
+
+  tools {
+    maven "maven-3.6.3"
+    git "Default"
+  }
+  stages {
+    stage('Stage 1 - Checkout Code') {
+      steps {
+        script {
+          properties([pipelineTriggers([pollSCM('')])])
+        }
+        //Get the code form GITHUB							
+        git 'https://github.com/ajithrajd/devops-demo.git'
+
+      }
+    }
+    stage('Stage 2 - Compile Code') {
+      steps {
+        //cmd to compile the code							
+        sh "mvn compile"
+      }
+    }
+    stage('Stage 3 - Run Unit Tests') {
+      steps {
+        //cmd to run tests							
+        sh "mvn test"
+      }
+    }
+    stage('Stage 4 -Create package') {
+      steps {
+        //cmd to create the build of project							
+        sh "mvn package"
+      }
+    }
+    stage('Stage 5 - clean install') {
+      steps {
+        //cmd to create the build of project							
+        sh "mvn clean install"
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        sh 'sudo docker build -t ajithraj123/devops-demo:$BUILD_NUMBER .'
+        echo 'Build Image Completed'
+      }
+    }
+    stage('Login to Docker Hub') {
+      steps {
+        sh 'echo dckr_pat_PJX7HiZXHEliyLEfjyb96qEgROw | sudo docker login -u ajithraj123 --password-stdin'
+        echo 'Login Completed'
+      }
+    }
+    stage('Push Image to Docker Hub') {
+      steps {
+        sh 'sudo docker push ajithraj123/devops-demo:$BUILD_NUMBER'
+        echo 'Push Image Completed'
+      }
+    }
+
+    stage('Deploy to Tomcat') {
+      steps {
+	 sh '''
+	    #!/bin/bash
+	    sudo cp -rf /var/lib/jenkins/workspace/CI_PIPELINE/target/ABCtechnologies-1.0.war /home/ajith/Tomcat/apache-tomcat-8.0.53/webapps/cicd.war
+	 '''
+      }
+    }
+
+  }
+
+  post {
+    failure {
+      //Send email to team about the failure
+      //emailext body: 'Jenkins build failed', subject: 'Jenkins build failed', to: 'test1@test.com'
+
+      echo "Email sent for Jenkins build failed"
+    }
+  }
+
+}
