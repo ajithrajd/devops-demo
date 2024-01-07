@@ -1,7 +1,7 @@
 <html>
 <body>
 <h2>Welcome to Bejoy devops technologies</h2>
-<h3>This is retail portal developed By Bejoy - V1.6 </h3>
+<h3>This is retail portal developed By Bejoy - V1.7 </h3>
 <button name="Add Product" value="Add Product" type="button" onclick="addProduct()">Add Product</button>  
 <script>  
 function addProduct(){  
