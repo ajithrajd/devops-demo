@@ -1,0 +1,24 @@
+---
+- hosts: ansible-server
+  become: true
+
+  tasks:
+  
+  - name: Login to Dockerhub
+    command: sudo docker login -u ajithraj123 -p dckr_pat_PJX7HiZXHEliyLEfjyb96qEgROw 
+  
+  - name: create docker image using war file
+    command: sudo docker build -t ajithraj123/devops-demo:latest .
+    args:
+      chdir: /opt/k8s-lab
+
+  - name: create tag to image
+    command: sudo docker tag ajithraj123/devops-demo ajithraj123/devops-demo
+
+  - name: push image on to dockerhub
+    command: sudo docker push ajithraj123/devops-demo:latest
+
+ # - name: remove docker images from ansible server
+ #   command: sudo docker rmi ajithraj123/devops-demo:latest ajithraj123/devops-demo
+#    ignore_errors: yes
+
