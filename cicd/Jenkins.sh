@@ -82,6 +82,9 @@ pipeline {
     stage('Deploy to K8s') {
 	steps {
 	    sshagent(credentials: ['ssh_ansible']) {
+	      sh 'scp $WORKSPACE/webapp/target/webapp.war ubuntu@$ANSIBLE_SERVER_IP:/opt/k8s-lab/'
+	    }	
+	    sshagent(credentials: ['ssh_ansible']) {
 	      sh 'ssh -o StrictHostKeyChecking=no -l ubuntu $ANSIBLE_SERVER_IP ansible-playbook -i /opt/k8s-lab/hosts /opt/k8s-lab/create-simple-devops-image.yml'
 	    }
 	    sshagent(credentials: ['ssh_ansible']) {
