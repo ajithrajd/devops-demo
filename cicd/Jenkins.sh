@@ -4,12 +4,11 @@ pipeline {
   
   // Define variables
   environment {
-    TOMCAT_HOME = "/home/ajith/Tomcat/apache-tomcat-8.0.53"
-    GIT_REPO = "https://github.com/ajithrajd/devops-demo.git"
-    // dckr_pat is the id used when defining the Docker Hub credentials in Jenkins. 
+    GIT_REPO = "https://github.com/bejoykoottumkal/devops-lab.git"
+    // dckr_bejoy is the id used when defining the Docker Hub credentials in Jenkins. 
     DOCKERHUB_CREDENTIALS= credentials('dckr_bejoy') 
     DOCKER_HUB_REPO = "bejoykoottumkal/devops-lab"
-    ANSIBLE_SERVER_IP="52.90.96.184"    
+    ANSIBLE_SERVER_IP="34.236.148.84"    
   }  
 
   tools {
@@ -81,16 +80,16 @@ pipeline {
     
     stage('Deploy to K8s') {
 	steps {
-	    sshagent(credentials: ['ssh_ansible']) {
+	    sshagent(credentials: ['Ansible-new']) {
 	      sh 'scp $WORKSPACE/webapp/target/webapp.war ubuntu@$ANSIBLE_SERVER_IP:/opt/k8s-lab/'
 	    }	
-	    sshagent(credentials: ['ssh_ansible']) {
+	    sshagent(credentials: ['Ansible-new']) {
 	      sh 'ssh -o StrictHostKeyChecking=no -l ubuntu $ANSIBLE_SERVER_IP ansible-playbook -i /opt/k8s-lab/hosts /opt/k8s-lab/create-simple-devops-image.yml'
 	    }
-	    sshagent(credentials: ['ssh_ansible']) {
+	    sshagent(credentials: ['Ansible-new']) {
 	      sh 'ssh -o StrictHostKeyChecking=no -l ubuntu $ANSIBLE_SERVER_IP ansible-playbook -i /opt/k8s-lab/hosts /opt/k8s-lab/kubernetes-devops-lab-deployment.yml'
 	    }
-	    sshagent(credentials: ['ssh_ansible']) {
+	    sshagent(credentials: ['Ansible-new']) {
 	      sh 'ssh -o StrictHostKeyChecking=no -l ubuntu $ANSIBLE_SERVER_IP ansible-playbook -i ansible-playbook -i /opt/k8s-lab/hosts /opt/k8s-lab/kubernetes-devops-lab-service.yml'
 	    }		    	    
 	}    
